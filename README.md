@@ -1,11 +1,11 @@
 # JsonApiDotNetCore Performance Tests
 
-Hed to the [issues](https://github.com/json-api-dotnet/PerformanceReports/issues) 
+Head to the [issues](https://github.com/json-api-dotnet/PerformanceReports/issues) 
 to see the latest test results.
 
 ## What is this?
 
-This repository provides tooling for running load tests against a sample JADNC application.
+This repository provides tooling for running load tests against a JsonApiDotNetCore application.
 It uses [vegeta](https://github.com/tsenart/vegeta) to run tests against a sample application (located under `./app`).
 If you want to see the details of the tests, take a look at `./load-test/test.sh`
 
