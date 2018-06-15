@@ -1,0 +1,4 @@
+variables.env
+bin/
+obj/
+results/

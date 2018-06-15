@@ -1,0 +1,25 @@
+version: '3.1'
+services:
+    db:
+      image: postgres
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: postgres
+    app:
+        build: .
+        ports:
+            - 5000:80
+        depends_on:
+            - db
+        environment:
+            Data:DefaultConnection: "Host=db;Port=5432;Database=JsonApiDotNetCorePerformanceTest;User ID=postgres;Password=postgres"
+        env_file:
+            - variables.env
+    test:
+        build: ./load-test
+        depends_on:
+            - app
+        env_file:
+            - variables.env
+        volumes:
+            - ./load-test/results:/app/results
