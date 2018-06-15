@@ -1,3 +1,6 @@
+echo "Waiting an arbitrary amount of time to ensure the database is ready to accept connections"
+sleep 5
+
 echo "Checking to see if webserver is ready"
 i=0
 
