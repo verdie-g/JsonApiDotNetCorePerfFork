@@ -4,7 +4,7 @@ sleep 30
 echo "Checking to see if webserver is ready"
 i=0
 
-while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/articles)" != "200" ]; do 
+while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/articles)" != "200" ]; do
     echo "Webserver not up yet."
     sleep 1
 done
@@ -18,8 +18,8 @@ attack() {
         vegeta attack -rate=$2 -duration=$3s | \
         tee results.bin | \
         vegeta report > $file_path
-    
-    i=$((i+1)) 
+
+    i=$((i+1))
 }
 
 attack_post() {
@@ -32,7 +32,7 @@ attack_post() {
         tee results.bin | \
         vegeta report > $file_path
 
-    i=$((i+1)) 
+    i=$((i+1))
 }
 
 warmup() {

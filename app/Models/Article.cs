@@ -1,10 +1,11 @@
-using JsonApiDotNetCore.Models;
+using JsonApiDotNetCore.Resources;
+using JsonApiDotNetCore.Resources.Annotations;
 
 namespace app.Models
 {
     public class Article : Identifiable
     {
-        [Attr("name")]
+        [Attr]
         public string Name { get; set; }
     }
 }
