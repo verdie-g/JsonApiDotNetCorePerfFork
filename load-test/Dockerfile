@@ -7,6 +7,6 @@ RUN go get "github.com/google/go-github/github"
 
 COPY test.sh .
 COPY upload_results.go .
-COPY article.json .
+COPY tag.json .
 
 ENTRYPOINT ["sh", "./test.sh"]

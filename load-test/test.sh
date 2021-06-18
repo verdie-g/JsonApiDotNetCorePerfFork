@@ -2,20 +2,21 @@ echo "Waiting an arbitrary amount of time to ensure the database is ready to acc
 sleep 30
 
 echo "Checking to see if webserver is ready"
-i=0
+i=1
 
-while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/articles)" != "200" ]; do
+while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/todoItems)" != "200" ]; do
     echo "Webserver not up yet."
     sleep 1
 done
 
-attack() {
-    file_name="$i-$1_$2_$3.txt"
+attack_get() {
+    file_name="$i-GET_$1_$3_$4.txt"
     file_path="./results/$file_name"
+    url="http://app$2"
 
     echo "Running $file_name"
-    echo "GET http://app:80/articles" | \
-        vegeta attack -rate=$2 -duration=$3s | \
+    echo "GET $url" | \
+        vegeta attack -rate=$3 -duration=$4s | \
         tee results.bin | \
         vegeta report > $file_path
 
@@ -23,51 +24,74 @@ attack() {
 }
 
 attack_post() {
-    file_name="$i-$1_$2_$3.txt"
+    file_name="$i-POST_$1_$4_$5.txt"
     file_path="./results/$file_name"
+    url="http://app$2"
 
     echo "Running $file_name"
-    echo "POST http://app:80/articles \\nContent-Type: application/vnd.api+json \\nAccept: application/vnd.api+json" | \
-        vegeta attack -rate=$2 -duration=$3s -body $4 | \
+    echo "POST $url \\nContent-Type: application/vnd.api+json" | \
+        vegeta attack -rate=$4 -duration=$5s -body $3 | \
         tee results.bin | \
         vegeta report > $file_path
 
     i=$((i+1))
 }
 
+get_todoItems() {
+    attack_get "Warmup" "/todoItems" $1 $2
+}
+
+get_todoItems_sort() {
+    attack_get "TodoItems_Sort" "/todoItems?sort=-id" $1 $2
+}
+
+get_todoItem_includes() {
+    attack_get "TodoItem_Includes" "/todoItems/1?include=owner,assignee,tags" $1 $2
+}
+
+get_todoItems_pagination() {
+    attack_get "TodoItems_Pagination" "/todoItems?page%5Bsize%5D=5&page%5Bnumber%5D=8" $1 $2
+}
+
+get_todoItems_filter() {
+    attack_get "TodoItems_Filter" "/todoItems?filter=and(equals(priority,%27High%27),equals(owner.firstName,%27Debbi%27))" $1 $2
+}
+
+get_todoItems_fields() {
+    attack_get "TodoItems_Fields" "/todoItems?fields%5BtodoItems%5D=description,priority" $1 $2
+}
+
+get_todoItem_tags() {
+    attack_get "TodoItem_Tags" "/todoItems/1/tags" $1 $2
+}
+
+post_tag() {
+    attack_post "Tag" "/tags" "tag.json" $1 $2
+}
+
 warmup() {
     echo "Warmup phase started"
-    attack "Warmup_GET_Empty" 1 10
+    get_todoItems 1 10
     sleep 1
-    attack "Warmup_GET_Empty" 5 10
+    get_todoItems 10 10
     sleep 1
-    attack "Warmup_GET_Empty" 10 10
+    get_todoItems 50 10
     sleep 1
     echo "Warmup phase completed"
 }
 
-get_articles_empty() {
-    attack "GET_Articles_Empty" $1 $2
-}
-
-create_articles() {
-    attack_post "POST_Articles" $1 $2 "article.json"
-}
-
-get_articles_all() {
-    attack "GET_Articles_All" $1 $2
-}
-
 warmup
-get_articles_empty 20 10
-get_articles_empty 50 10
-create_articles 20 10
-create_articles 50 10
-get_articles_all 1 10
+get_todoItems_sort 50 10
+get_todoItem_includes 50 10
+get_todoItems_pagination 50 10
+get_todoItems_filter 50 10
+get_todoItems_fields 50 10
+get_todoItem_tags 50 10
+post_tag 50 10
 
 if [ "$UPLOAD_RESULTS" = "true" ]; then
     echo "Test complete. Uploading results."
     go run ./upload_results.go
 else
-    echo "Skipping results upload."
+    echo "Test complete. Skipping results upload."
 fi

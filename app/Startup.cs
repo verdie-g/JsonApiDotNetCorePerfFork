@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 
 namespace app
 {
@@ -21,15 +22,19 @@ namespace app
         {
             services.AddDbContext<AppDbContext>(options => options.UseNpgsql(_connectionString));
 
-
-            services.AddJsonApi<AppDbContext>();
+            services.AddJsonApi<AppDbContext>(options =>
+            {
+                options.UseRelativeLinks = true;
+                options.ValidateModelState = true;
+                options.IncludeTotalResourceCount = true;
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, AppDbContext context)
+        public void Configure(IApplicationBuilder app, AppDbContext dbContext)
         {
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
+            Seeder.EnsureSampleData(dbContext);
 
             app.UseRouting();
             app.UseJsonApi();
