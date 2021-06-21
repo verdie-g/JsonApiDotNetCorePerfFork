@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 echo "Waiting an arbitrary amount of time to ensure the database is ready to accept connections"
 sleep 30
 
@@ -91,7 +93,7 @@ post_tag 50 10
 
 if [ "$UPLOAD_RESULTS" = "true" ]; then
     echo "Test complete. Uploading results."
-    go run ./upload_results.go
+    ./upload_results
 else
     echo "Test complete. Skipping results upload."
 fi
