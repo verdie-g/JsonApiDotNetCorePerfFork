@@ -13,3 +13,8 @@
 
 # Ignore binary which is locally build
 ./upload_results
+
+# Ignore changes to Go dependencies, so they are always the latest
+# when running go mod tidy
+go.mod
+go.sum
