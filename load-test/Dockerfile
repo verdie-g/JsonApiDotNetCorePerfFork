@@ -10,7 +10,7 @@ COPY upload_results.go .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o upload_results
 
 # Build vegeta.
-RUN go get -u github.com/tsenart/vegeta
+RUN CGO_ENABLED=0 GOOS=linux go get -u github.com/tsenart/vegeta
 
 # The image we actually run
 FROM alpine:latest  
@@ -18,8 +18,8 @@ RUN apk --no-cache add ca-certificates curl
 WORKDIR /root/
 
 # Copy in requirements
-COPY --from=builder /app/upload_results .
-COPY --from=builder /go/bin/vegeta .
+COPY --from=builder /app/upload_results /bin/upload_results
+COPY --from=builder /go/bin/vegeta /bin/vegeta
 
 COPY tag.json .
 COPY test.sh .
