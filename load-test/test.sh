@@ -11,9 +11,14 @@ while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/
     sleep 1
 done
 
+results_dir="./results"
+if [ ! -e "$results_dir" ]; then
+    mkdir -p "$results_dir"
+fi
+
 attack_get() {
     file_name="$i-GET_$1_$3_$4.txt"
-    file_path="./results/$file_name"
+    file_path="./$results_dir/$file_name"
     url="http://app$2"
 
     echo "Running $file_name"
@@ -27,7 +32,7 @@ attack_get() {
 
 attack_post() {
     file_name="$i-POST_$1_$4_$5.txt"
-    file_path="./results/$file_name"
+    file_path="./$results_dir/$file_name"
     url="http://app$2"
 
     echo "Running $file_name"
@@ -93,7 +98,7 @@ post_tag 50 10
 
 if [ "$UPLOAD_RESULTS" = "true" ]; then
     echo "Test complete. Uploading results."
-    ./upload_results
+    upload_results
 else
     echo "Test complete. Skipping results upload."
 fi
