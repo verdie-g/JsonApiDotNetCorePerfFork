@@ -3,11 +3,10 @@ FROM golang:latest AS builder
 WORKDIR /app
 
 COPY go.mod .
-COPY go.sum .
 COPY upload_results.go .
 
-# Make sure we have the latest version of the Github library.
-RUN go get -u github.com/google/go-github/v35
+# Replace Github dependency with latest version.
+RUN go mod tidy
 
 # Build our results uploader.
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o upload_results
