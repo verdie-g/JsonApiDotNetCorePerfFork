@@ -6,7 +6,10 @@ COPY go.mod .
 COPY go.sum .
 COPY upload_results.go .
 
-# Build our own uploader.
+# Make sure we have the latest version of the Github library.
+RUN go get -u github.com/google/go-github/v35
+
+# Build our results uploader.
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o upload_results
 
 # Build vegeta.
