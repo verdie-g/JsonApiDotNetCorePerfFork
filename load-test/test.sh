@@ -31,13 +31,13 @@ attack_get() {
 
 attack_post() {
     prefix=$(printf "%03d" $i)
-    file_name="$prefix-POST_$1_$4_$5.txt"
+    file_name="$prefix-POST_$1_$3_$4.txt"
     file_path="$results_dir/$file_name"
     url="http://app$2"
 
     echo "Running $file_name"
     echo "POST $url \\nContent-Type: application/vnd.api+json" | \
-        vegeta attack -rate=$4 -duration=$5s -body $3 | \
+        vegeta attack -rate=$3 -duration=$4s -body $5 | \
         tee results.bin | \
         vegeta report > $file_path
 
@@ -74,7 +74,7 @@ get_todoItem_tags() {
 }
 
 post_tag() {
-    attack_post "Tag" "/tags" "tag.json" $1 $2
+    attack_post "Tag" "/tags" $1 $2 "tag.json"
 }
 
 warmup() {
