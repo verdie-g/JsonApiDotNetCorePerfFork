@@ -12,13 +12,10 @@ while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/
 done
 
 results_dir="./results"
-if [ ! -e "$results_dir" ]; then
-    mkdir -p "$results_dir"
-fi
 
 attack_get() {
     file_name="$i-GET_$1_$3_$4.txt"
-    file_path="./$results_dir/$file_name"
+    file_path="$results_dir/$file_name"
     url="http://app$2"
 
     echo "Running $file_name"
@@ -27,12 +24,13 @@ attack_get() {
         tee results.bin | \
         vegeta report > $file_path
 
+    chmod go+w $file_path
     i=$((i+1))
 }
 
 attack_post() {
     file_name="$i-POST_$1_$4_$5.txt"
-    file_path="./$results_dir/$file_name"
+    file_path="$results_dir/$file_name"
     url="http://app$2"
 
     echo "Running $file_name"
@@ -41,6 +39,7 @@ attack_post() {
         tee results.bin | \
         vegeta report > $file_path
 
+    chmod go+w $file_path
     i=$((i+1))
 }
 
@@ -102,3 +101,7 @@ if [ "$UPLOAD_RESULTS" = "true" ]; then
 else
     echo "Test complete. Skipping results upload."
 fi
+
+echo "Signaling test completion."
+touch "$results_dir/test-completed-signal"
+chmod go+w "$results_dir/test-completed-signal"
