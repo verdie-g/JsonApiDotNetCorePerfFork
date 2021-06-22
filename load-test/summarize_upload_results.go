@@ -24,7 +24,12 @@ func main() {
 		content += readFile(file)
 	}
 
-	uploadFile(content)
+	data := []byte(content)
+	ioutil.WriteFile("./results/summary.md", data, 0644)
+
+	if os.Getenv("UPLOAD_RESULTS") == "true" {
+		uploadFile(content)
+	}
 }
 
 func getTitle(fileName string) string {

@@ -96,11 +96,12 @@ get_todoItem_tags 50 10
 post_tag 50 10
 
 if [ "$UPLOAD_RESULTS" = "true" ]; then
-    echo "Test complete. Uploading results."
-    upload_results
+    echo "Test complete. Writing summary and uploading results."
 else
-    echo "Test complete. Skipping results upload."
+    echo "Test complete. Writing summary and skipping results upload."
 fi
+summarize_upload_results
+chmod go+w "$results_dir/summary.md"
 
 echo "Signaling test completion."
 touch "$results_dir/test-completed-signal"
