@@ -36,8 +36,8 @@ attack_post() {
     url="http://app$2"
 
     echo "Running $file_name"
-    echo "POST $url \\nContent-Type: application/vnd.api+json" | \
-        vegeta attack -rate=$3 -duration=$4s -body $5 | \
+    echo "POST $url" | \
+        vegeta attack -rate=$3 -duration=$4s -header "Content-Type: application/vnd.api+json" -body $5 | \
         tee results.bin | \
         vegeta report > $file_path
 
