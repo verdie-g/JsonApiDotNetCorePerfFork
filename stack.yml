@@ -22,4 +22,4 @@ services:
         env_file:
             - variables.env
         volumes:
-            - ./load-test/results:/app/results
+            - ./load-test/results:/root/results
