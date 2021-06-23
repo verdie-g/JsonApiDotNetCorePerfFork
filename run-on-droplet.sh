@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 case ${DIGITAL_OCEAN_TOKEN-} in '') echo "$0: Environment variable DIGITAL_OCEAN_TOKEN is not set" >&2; exit 1;; esac
 
 export UPLOAD_RESULTS="true"

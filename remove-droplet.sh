@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 docker-machine stop docker-sandbox
 docker-machine rm docker-sandbox -y
 

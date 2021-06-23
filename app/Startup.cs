@@ -1,45 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using app.Data;
-using JsonApiDotNetCore.Extensions;
+﻿using app.Data;
+using JsonApiDotNetCore.Configuration;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 
 namespace app
 {
     public class Startup
     {
-        private readonly IConfiguration _config;
+        private readonly string _connectionString;
 
         public Startup(IConfiguration config)
         {
-            _config = config;
+            _connectionString = config["Data:DefaultConnection"];
         }
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            // add the db context like you normally would
-            services.AddDbContext<AppDbContext>(options =>
-            { // use whatever provider you want, this is just an example
-                options.UseNpgsql(_config["Data:DefaultConnection"]);
-            }, ServiceLifetime.Scoped);
+            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(_connectionString));
 
-            // add jsonapi dotnet core
-            services.AddJsonApi<AppDbContext>();
+            services.AddJsonApi<AppDbContext>(options =>
+            {
+                options.UseRelativeLinks = true;
+                options.ValidateModelState = true;
+                options.IncludeTotalResourceCount = true;
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, AppDbContext context)
+        public void Configure(IApplicationBuilder app, AppDbContext dbContext)
         {
-            context.Database.EnsureCreated();
+            Seeder.EnsureSampleData(dbContext);
+
+            app.UseRouting();
             app.UseJsonApi();
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

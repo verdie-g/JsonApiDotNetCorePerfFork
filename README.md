@@ -1,6 +1,8 @@
 # JsonApiDotNetCore Performance Tests
 
-Head to the [issues](https://github.com/json-api-dotnet/PerformanceReports/issues) 
+[![Build status](https://ci.appveyor.com/api/projects/status/0qxgxdu8inpyp491/branch/master?svg=true)](https://ci.appveyor.com/project/json-api-dotnet/performancereports/branch/master)
+
+Head to the [issues](https://github.com/json-api-dotnet/PerformanceReports/issues)
 to see the latest test results.
 
 ## What is this?
@@ -17,8 +19,8 @@ ASP.Net Core → JsonApiDotNetCore → Entity Framework Core → Npgsql → Post
 
 ### Execution Environment
 
-The app and database run inside separate docker containers using docker-compose for orchestration. 
-The test can be executed locally or on a Digital Ocean VM. 
+The app and database run inside separate docker containers using docker-compose for orchestration.
+The test can be executed locally or on a Digital Ocean VM.
 docker-machine is used to create the VM on demand using the token specified in variables.env.
 
 ## Running The Test
@@ -50,7 +52,7 @@ open ./variables.env
 ### Running On Digital Ocean Droplet
 
 - Set configuration in `variables.env`
-- Run the test 
+- Run the test
 
 ```
 ./run-on-droplet.sh

@@ -1,0 +1,23 @@
+image: Ubuntu
+
+version: '{build}'
+
+stack: docker
+
+install:
+- sh: sudo ./install.sh
+
+branches:
+  only:
+  - master
+
+pull_requests:
+  do_not_increment_build_number: true
+
+artifacts:
+- path: ./load-test/results
+
+build_script:
+- sh: ./run-local.sh
+
+test: off

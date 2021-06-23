@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v35/github"
 	"golang.org/x/oauth2"
 )
 
@@ -24,7 +24,12 @@ func main() {
 		content += readFile(file)
 	}
 
-	uploadFile(content)
+	data := []byte(content)
+	ioutil.WriteFile("./results/summary.md", data, 0644)
+
+	if os.Getenv("UPLOAD_RESULTS") == "true" {
+		uploadFile(content)
+	}
 }
 
 func getTitle(fileName string) string {
@@ -36,7 +41,7 @@ func getTitle(fileName string) string {
 	rps := split[last-1]
 	rem := strings.Join(split[:last-1], " ")
 
-	title := fmt.Sprintf("%s %s RPS for %s seconds", rem, rps, duration)
+	title := fmt.Sprintf("%s: %s req/sec for %s seconds", rem, rps, duration)
 
 	return title
 }
@@ -52,7 +57,7 @@ func readFile(path string) string {
 	body = strings.Replace(body, " [", " | [", -1)
 	body = strings.Replace(body, "] ", "] | ", -1)
 
-	header := "| Measure | Key |  Result | \n |---|---|---| \n | "
+	header := "| Measure | Key | Result |\n|---|---|---|\n|"
 	body = header + body
 	body = removeTrailingPipe(body)
 	return body
