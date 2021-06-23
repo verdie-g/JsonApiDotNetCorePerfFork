@@ -1,5 +1,7 @@
 # JsonApiDotNetCore Performance Tests
 
+[![Build status](https://ci.appveyor.com/api/projects/status/0qxgxdu8inpyp491/branch/master?svg=true)](https://ci.appveyor.com/project/json-api-dotnet/performancereports/branch/master)
+
 Head to the [issues](https://github.com/json-api-dotnet/PerformanceReports/issues)
 to see the latest test results.
 
