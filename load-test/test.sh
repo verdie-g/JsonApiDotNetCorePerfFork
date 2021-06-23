@@ -4,7 +4,7 @@ echo "Waiting an arbitrary amount of time to ensure the database is ready to acc
 sleep 30
 
 echo "Checking to see if webserver is ready"
-i=001
+i=1
 
 while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/todoItems)" != "200" ]; do
     echo "Webserver not up yet."
