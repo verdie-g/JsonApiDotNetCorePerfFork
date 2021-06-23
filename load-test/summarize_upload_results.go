@@ -41,7 +41,7 @@ func getTitle(fileName string) string {
 	rps := split[last-1]
 	rem := strings.Join(split[:last-1], " ")
 
-	title := fmt.Sprintf("%s %s RPS for %s seconds", rem, rps, duration)
+	title := fmt.Sprintf("%s: %s req/sec for %s seconds", rem, rps, duration)
 
 	return title
 }
@@ -57,7 +57,7 @@ func readFile(path string) string {
 	body = strings.Replace(body, " [", " | [", -1)
 	body = strings.Replace(body, "] ", "] | ", -1)
 
-	header := "| Measure | Key |  Result | \n |---|---|---| \n | "
+	header := "| Measure | Key | Result |\n|---|---|---|\n|"
 	body = header + body
 	body = removeTrailingPipe(body)
 	return body
