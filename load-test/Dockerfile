@@ -12,7 +12,7 @@ RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o summarize_upload_results
 
 # Build vegeta.
-RUN CGO_ENABLED=0 GOOS=linux go get -u github.com/tsenart/vegeta
+RUN CGO_ENABLED=0 GOOS=linux go install github.com/tsenart/vegeta@latest
 
 # The image we actually run
 FROM alpine:latest  
