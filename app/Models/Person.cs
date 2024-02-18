@@ -4,7 +4,7 @@ using JsonApiDotNetCore.Resources.Annotations;
 
 namespace app.Models
 {
-    public sealed class Person : Identifiable
+    public sealed class Person : Identifiable<int>
     {
         [Attr]
         public string FirstName { get; set; }

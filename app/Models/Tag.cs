@@ -4,7 +4,7 @@ using JsonApiDotNetCore.Resources.Annotations;
 
 namespace app.Models
 {
-    public sealed class Tag : Identifiable
+    public sealed class Tag : Identifiable<int>
     {
         [Required]
         [MinLength(1)]

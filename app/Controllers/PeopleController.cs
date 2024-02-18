@@ -6,10 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace app.Controllers
 {
-    public sealed class PeopleController : JsonApiController<Person>
+    public sealed class PeopleController : JsonApiController<Person, int>
     {
-        public PeopleController(IJsonApiOptions options, ILoggerFactory loggerFactory, IResourceService<Person> resourceService)
-            : base(options, loggerFactory, resourceService)
+        public PeopleController(
+            IJsonApiOptions options,
+            IResourceGraph resourceGraph,
+            ILoggerFactory loggerFactory,
+            IResourceService<Person, int> resourceService)
+            : base(options, resourceGraph, loggerFactory, resourceService)
         {
         }
     }

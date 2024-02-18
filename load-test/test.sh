@@ -6,7 +6,7 @@ sleep 30
 echo "Checking to see if webserver is ready"
 i=1
 
-while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app/todoItems)" != "200" ]; do
+while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app:8080/todoItems)" != "200" ]; do
     echo "Webserver not up yet."
     sleep 1
 done
@@ -17,7 +17,7 @@ attack_get() {
     prefix=$(printf "%03d" $i)
     file_name="$prefix-GET_$1_$3_$4.txt"
     file_path="$results_dir/$file_name"
-    url="http://app$2"
+    url="http://app:8080$2"
 
     echo "Running $file_name"
     echo "GET $url" | \
@@ -33,7 +33,7 @@ attack_post() {
     prefix=$(printf "%03d" $i)
     file_name="$prefix-POST_$1_$3_$4.txt"
     file_path="$results_dir/$file_name"
-    url="http://app$2"
+    url="http://app:8080$2"
 
     echo "Running $file_name"
     echo "POST $url" | \

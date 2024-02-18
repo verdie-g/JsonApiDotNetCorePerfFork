@@ -1,19 +1,30 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+﻿using app;
+using app.Data;
+using JsonApiDotNetCore.Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace app
+var builder = WebApplication.CreateBuilder(args);
+
+string connectionString = builder.Configuration["Data:DefaultConnection"];
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+
+builder.Services.AddJsonApi<AppDbContext>(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+    options.UseRelativeLinks = true;
+    options.IncludeTotalResourceCount = true;
+});
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
-        }
-    }
+var app = builder.Build();
+
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    Seeder.EnsureSampleData(scope.ServiceProvider.GetRequiredService<AppDbContext>());
 }
+
+app.UseRouting();
+app.UseJsonApi();
+app.MapControllers();
+
+app.Run();

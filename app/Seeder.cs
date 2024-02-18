@@ -91,7 +91,7 @@ namespace app
             var assigneeIterator = new LoopingCollectionIterator<Person>(people, 2);
             var tagIterator = new LoopingCollectionIterator<Tag>(tags);
 
-            var creationTime = new DateTimeOffset(2000, 1, 1, 1, 1, 1, 1, TimeSpan.FromHours(5));
+            var creationTime = new DateTimeOffset(2000, 1, 1, 1, 1, 1, 1, TimeSpan.Zero);
             var lastModifiedOffset = new TimeSpan(2, 2, 2, 2, 2);
 
             for (int todoItemIndex = 1; todoItemIndex <= 1000; todoItemIndex++)
@@ -104,21 +104,12 @@ namespace app
                     LastModifiedAt = creationTime + lastModifiedOffset,
                     Owner = ownerIterator.GetNext(),
                     Assignee = assigneeIterator.GetNext(),
-                    TodoItemTags = new HashSet<TodoItemTag>
+                    Tags = new HashSet<Tag>
                     {
-                        new TodoItemTag
-                        {
-                            Tag = tagIterator.GetNext()
-                        },
-                        new TodoItemTag
-                        {
-                            Tag = tagIterator.GetNext()
-                        },
-                        new TodoItemTag
-                        {
-                            Tag = tagIterator.GetNext()
-                        }
-                    }
+                        tagIterator.GetNext(),
+                        tagIterator.GetNext(),
+                        tagIterator.GetNext(),
+                    },
                 };
 
                 creationTime += TimeSpan.FromDays(1);

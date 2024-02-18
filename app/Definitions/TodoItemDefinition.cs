@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace app.Definitions
 {
-    public sealed class TodoItemDefinition : JsonApiResourceDefinition<TodoItem>
+    public sealed class TodoItemDefinition : JsonApiResourceDefinition<TodoItem, int>
     {
         private readonly ISystemClock _systemClock;
 
@@ -34,13 +34,13 @@ namespace app.Definitions
             });
         }
 
-        public override Task OnWritingAsync(TodoItem resource, OperationKind operationKind, CancellationToken cancellationToken)
+        public override Task OnWritingAsync(TodoItem resource, WriteOperationKind writeOperation, CancellationToken cancellationToken)
         {
-            if (operationKind == OperationKind.CreateResource)
+            if (writeOperation == WriteOperationKind.CreateResource)
             {
                 resource.CreatedAt = _systemClock.UtcNow;
             }
-            else if (operationKind == OperationKind.UpdateResource)
+            else if (writeOperation == WriteOperationKind.UpdateResource)
             {
                 resource.LastModifiedAt = _systemClock.UtcNow;
             }

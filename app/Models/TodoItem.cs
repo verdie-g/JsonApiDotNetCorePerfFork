@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using JsonApiDotNetCore.Resources;
 using JsonApiDotNetCore.Resources.Annotations;
 
 namespace app.Models
 {
-    public sealed class TodoItem : Identifiable
+    public sealed class TodoItem : Identifiable<int>
     {
         [Attr]
         public string Description { get; set; }
@@ -26,10 +25,7 @@ namespace app.Models
         [HasOne]
         public Person Assignee { get; set; }
 
-        [NotMapped]
-        [HasManyThrough(nameof(TodoItemTags))]
+        [HasMany]
         public ISet<Tag> Tags { get; set; }
-
-        public ISet<TodoItemTag> TodoItemTags { get; set; }
     }
 }

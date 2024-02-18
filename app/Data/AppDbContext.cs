@@ -16,13 +16,6 @@ namespace app.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<TodoItemTag>()
-                .HasKey(todoItemTag => new
-                {
-                    todoItemTag.TodoItemId,
-                    todoItemTag.TagId
-                });
-
             // When deleting a person, un-assign him/her from existing todo items.
             builder.Entity<Person>()
                 .HasMany(person => person.AssignedTodoItems)
