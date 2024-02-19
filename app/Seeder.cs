@@ -1,17 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using app.Data;
 using app.Models;
+using Microsoft.Extensions.Logging;
 
 namespace app
 {
     internal static class Seeder
     {
-        public static void EnsureSampleData(AppDbContext dbContext)
+        public static async Task EnsureSampleData(AppDbContext dbContext, ILogger logger)
         {
-            dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
+            while (!await dbContext.Database.CanConnectAsync())
+            {
+                logger.LogInformation("Database not up yet");
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+
+            await dbContext.Database.EnsureDeletedAsync();
+            await dbContext.Database.EnsureCreatedAsync();
 
             List<Tag> tags = CreateTags().ToList();
             List<Person> people = CreatePeople().ToList();
@@ -21,7 +29,7 @@ namespace app
             dbContext.People.AddRange(people);
             dbContext.TodoItems.AddRange(todoItems);
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
 
         private static IEnumerable<Tag> CreateTags()
