@@ -1,4 +1,5 @@
-﻿using app;
+﻿using System.Text.Json.Serialization;
+using app;
 using app.Data;
 using JsonApiDotNetCore.Configuration;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +15,7 @@ builder.Services.AddJsonApi<AppDbContext>(options =>
 {
     options.UseRelativeLinks = true;
     options.IncludeTotalResourceCount = true;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 var app = builder.Build();
