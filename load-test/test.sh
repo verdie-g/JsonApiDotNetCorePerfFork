@@ -1,110 +1,62 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-echo "Waiting an arbitrary amount of time to ensure the database is ready to accept connections"
-sleep 30
+set -e
 
-echo "Checking to see if webserver is ready"
-i=1
-
-while [ "$(curl --write-out %{http_code} --silent --output /dev/null http://app:8080/todoItems)" != "200" ]; do
-    echo "Webserver not up yet."
-    sleep 1
-done
+BASE_URL='http://host.docker.internal:5000'
 
 results_dir="./results"
 
-attack_get() {
+attack() {
     prefix=$(printf "%03d" $i)
-    file_name="$prefix-GET_$1_$3_$4.txt"
+    file_name="$prefix-$1_$3_$4.txt"
     file_path="$results_dir/$file_name"
-    url="http://app:8080$2"
 
     echo "Running $file_name"
-    echo "GET $url" | \
-        vegeta attack -rate=$3 -duration=$4s | \
+    echo "$2" | \
+        vegeta attack -format=json -rate=$3 -duration=$4m | \
         tee results.bin | \
         vegeta report > $file_path
 
-    chmod go+w $file_path
-    i=$((i+1))
-}
-
-attack_post() {
-    prefix=$(printf "%03d" $i)
-    file_name="$prefix-POST_$1_$3_$4.txt"
-    file_path="$results_dir/$file_name"
-    url="http://app:8080$2"
-
-    echo "Running $file_name"
-    echo "POST $url" | \
-        vegeta attack -rate=$3 -duration=$4s -header "Content-Type: application/vnd.api+json" -body $5 | \
-        tee results.bin | \
-        vegeta report > $file_path
-
-    chmod go+w $file_path
     i=$((i+1))
 }
 
 get_todoItems() {
-    attack_get "Warmup" "/todoItems" $1 $2
+    attack "TodoItems" "{\"method\": \"GET\", \"url\": \"$BASE_URL/todoItems\"}" $1 $2
 }
 
 get_todoItems_sort() {
-    attack_get "TodoItems_Sort" "/todoItems?sort=-id" $1 $2
+    attack "TodoItems_Sort" "{\"method\": \"GET\", \"url\": \"$BASE_URL/todoItems?sort=-id\"}" $1 $2
 }
 
 get_todoItem_includes() {
-    attack_get "TodoItem_Includes" "/todoItems/1?include=owner,assignee,tags" $1 $2
+    attack "TodoItem_Includes" "{\"method\": \"GET\", \"url\": \"$BASE_URL/todoItems/1?include=owner,assignee\"}" $1 $2
 }
 
 get_todoItems_pagination() {
-    attack_get "TodoItems_Pagination" "/todoItems?page%5Bsize%5D=5&page%5Bnumber%5D=8" $1 $2
+    attack "TodoItems_Pagination" "{\"method\": \"GET\", \"url\": \"$BASE_URL/todoItems?page%5Bsize%5D=5&page%5Bnumber%5D=8\"}" $1 $2
 }
 
 get_todoItems_filter() {
-    attack_get "TodoItems_Filter" "/todoItems?filter=and(equals(priority,%27High%27),equals(owner.firstName,%27Debbi%27))" $1 $2
+    attack "TodoItems_Filter" "{\"method\": \"GET\", \"url\": \"$BASE_URL/todoItems?filter=and(equals(priority,%27High%27),equals(owner.firstName,%27Debbi%27))\"}" $1 $2
 }
 
 get_todoItems_fields() {
-    attack_get "TodoItems_Fields" "/todoItems?fields%5BtodoItems%5D=description,priority" $1 $2
+    attack "TodoItems_Fields" "{\"method\": \"GET\", \"url\": \"$BASE_URL/todoItems?fields%5BtodoItems%5D=description,priority\"}" $1 $2
 }
 
 get_todoItem_tags() {
-    attack_get "TodoItem_Tags" "/todoItems/1/tags" $1 $2
+    attack "TodoItem_Tags" "{\"method\": \"GET\", \"url\": \"$BASE_URL/todoItems/1/tags\"}" $1 $2
 }
 
 post_tag() {
-    attack_post "Tag" "/tags" $1 $2 "tag.json"
+    attack "Tag" "{\"method\": \"POST\", \"url\": \"$BASE_URL/tags\", \"headers\": {\"Content-Type\": \"application/vnd.api+json\"}, \"body\": \"eyJkYXRhIjp7InR5cGUiOiJ0YWdzIiwiYXR0cmlidXRlcyI6eyJuYW1lIjogIlRoaXMgaXMgYW4gZXhhbXBsZSB0YWcifX19\"}" $1 $2
 }
 
-warmup() {
-    echo "Warmup phase started"
-    get_todoItems 1 10
-    sleep 1
-    get_todoItems 10 10
-    sleep 1
-    get_todoItems 50 10
-    sleep 1
-    echo "Warmup phase completed"
-}
-
-warmup
-get_todoItems_sort 50 10
-get_todoItem_includes 50 10
-get_todoItems_pagination 50 10
-get_todoItems_filter 50 10
-get_todoItems_fields 50 10
-get_todoItem_tags 50 10
-post_tag 50 10
-
-if [ "$UPLOAD_RESULTS" = "true" ]; then
-    echo "Test complete. Writing summary and uploading results."
-else
-    echo "Test complete. Writing summary and skipping results upload."
-fi
-summarize_upload_results
-chmod go+w "$results_dir/summary.md"
-
-echo "Signaling test completion."
-touch "$results_dir/test-completed-signal"
-chmod go+w "$results_dir/test-completed-signal"
+# get_todoItems 50 5
+# get_todoItems_sort 50 5
+get_todoItem_includes 100 5
+# get_todoItems_pagination 50 5
+# get_todoItems_filter 50 5
+# get_todoItems_fields 100 5
+# get_todoItem_tags 100 5
+# post_tag 50 5

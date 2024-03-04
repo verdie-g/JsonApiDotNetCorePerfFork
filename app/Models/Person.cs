@@ -1,18 +1,14 @@
-using System.Collections.Generic;
 using JsonApiDotNetCore.Resources;
 using JsonApiDotNetCore.Resources.Annotations;
 
-namespace app.Models
+namespace App.Models;
+
+[Resource]
+public sealed class Person : Identifiable<int>
 {
-    public sealed class Person : Identifiable<int>
-    {
-        [Attr]
-        public string FirstName { get; set; }
+    [Attr] public string FirstName { get; set; } = default!;
 
-        [Attr]
-        public string LastName { get; set; }
+    [Attr] public string LastName { get; set; } = default!;
 
-        [HasMany]
-        public ISet<TodoItem> AssignedTodoItems { get; set; }
-    }
+    [HasMany] public ISet<TodoItem> AssignedTodoItems { get; set; } = default!;
 }

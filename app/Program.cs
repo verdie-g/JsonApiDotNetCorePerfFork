@@ -1,15 +1,21 @@
 ﻿using System.Text.Json.Serialization;
-using app;
-using app.Data;
+using App;
+using App.Data;
 using JsonApiDotNetCore.Configuration;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string connectionString = builder.Configuration["Data:DefaultConnection"];
+builder.Logging.AddSimpleConsole(options =>
+{
+    options.SingleLine = true;
+    options.TimestampFormat = "HH:mm:ss ";
+});
+
+var connectionString = builder.Configuration.GetConnectionString("Default")!;
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddJsonApi<AppDbContext>(options =>
@@ -19,13 +25,28 @@ builder.Services.AddJsonApi<AppDbContext>(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(b => b.AddService("app"))
+    .WithMetrics(b =>
+    {
+        b.AddMeter("*")
+            .AddProcessInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddOtlpExporter((exporterOptions, metricReaderOptions) =>
+            {
+                exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                exporterOptions.Endpoint = new Uri("http://localhost:8080/otlp/v1/metrics");
+                // 15 seconds is the default scrape interval of a prometheus data source in Grafana.
+                metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 15_000;
+            });
+    });
+
 var app = builder.Build();
 
-using (IServiceScope scope = app.Services.CreateScope())
+await using (var scope = app.Services.CreateAsyncScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    await Seeder.EnsureSampleData(dbContext, logger);
+    await Seeder.EnsureSampleDataAsync(dbContext);
 }
 
 app.UseRouting();

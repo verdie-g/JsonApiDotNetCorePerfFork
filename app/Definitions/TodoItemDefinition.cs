@@ -1,51 +1,36 @@
 using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
-using app.Models;
+using App.Models;
 using JsonApiDotNetCore.Configuration;
 using JsonApiDotNetCore.Middleware;
 using JsonApiDotNetCore.Queries.Expressions;
 using JsonApiDotNetCore.Resources;
 using Microsoft.AspNetCore.Authentication;
 
-namespace app.Definitions
+namespace App.Definitions;
+
+public sealed class TodoItemDefinition(IResourceGraph resourceGraph, ISystemClock systemClock)
+    : JsonApiResourceDefinition<TodoItem, int>(resourceGraph)
 {
-    public sealed class TodoItemDefinition : JsonApiResourceDefinition<TodoItem, int>
+    public override SortExpression OnApplySort(SortExpression? existingSort)
     {
-        private readonly ISystemClock _systemClock;
+        return existingSort ?? GetDefaultSortOrder();
+    }
 
-        public TodoItemDefinition(IResourceGraph resourceGraph, ISystemClock systemClock)
-            : base(resourceGraph)
-        {
-            _systemClock = systemClock;
-        }
+    private SortExpression GetDefaultSortOrder()
+    {
+        return CreateSortExpressionFromLambda([
+            (todoItem => todoItem.Priority, ListSortDirection.Descending),
+            (todoItem => todoItem.LastModifiedAt, ListSortDirection.Descending)
+        ]);
+    }
 
-        public override SortExpression OnApplySort(SortExpression existingSort)
-        {
-            return existingSort ?? GetDefaultSortOrder();
-        }
+    public override Task OnWritingAsync(TodoItem resource, WriteOperationKind writeOperation,
+        CancellationToken cancellationToken)
+    {
+        if (writeOperation == WriteOperationKind.CreateResource)
+            resource.CreatedAt = systemClock.UtcNow;
+        else if (writeOperation == WriteOperationKind.UpdateResource) resource.LastModifiedAt = systemClock.UtcNow;
 
-        private SortExpression GetDefaultSortOrder()
-        {
-            return CreateSortExpressionFromLambda(new PropertySortOrder
-            {
-                (todoItem => todoItem.Priority, ListSortDirection.Descending),
-                (todoItem => todoItem.LastModifiedAt, ListSortDirection.Descending)
-            });
-        }
-
-        public override Task OnWritingAsync(TodoItem resource, WriteOperationKind writeOperation, CancellationToken cancellationToken)
-        {
-            if (writeOperation == WriteOperationKind.CreateResource)
-            {
-                resource.CreatedAt = _systemClock.UtcNow;
-            }
-            else if (writeOperation == WriteOperationKind.UpdateResource)
-            {
-                resource.LastModifiedAt = _systemClock.UtcNow;
-            }
-
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+  grafana:
+    image: grafana/grafana-enterprise:10.3.3
+    command: ["-config=/etc/grafana/grafana.ini"]
+    volumes:
+      - "./grafana:/etc/grafana:ro"
+    ports:
+      - 3000:3000
+  mimir:
+    image: grafana/mimir:2.11.0
+    command: ["-config.file=/etc/mimir/mimir.yml"]
+    volumes:
+      - "./mimir:/etc/mimir:ro"
+    ports:
+      - 8080:8080
+      - 9095:9095

@@ -1,9 +1,7 @@
 {
   "profiles": {
-    "app": {
+    "App": {
       "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "todoItems",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

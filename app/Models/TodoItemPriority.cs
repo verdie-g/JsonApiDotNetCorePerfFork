@@ -1,9 +1,8 @@
-namespace app.Models
+namespace App.Models;
+
+public enum TodoItemPriority
 {
-    public enum TodoItemPriority
-    {
-        Low,
-        Medium,
-        High
-    }
+    Low,
+    Medium,
+    High
 }

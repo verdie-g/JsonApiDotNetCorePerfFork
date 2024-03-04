@@ -1,0 +1,13 @@
+multitenancy_enabled: false
+
+ingester:
+  ring:
+    replication_factor: 1
+
+ruler_storage:
+  filesystem:
+    dir: /data/ruler
+
+blocks_storage:
+  filesystem:
+    dir: /data/blocks

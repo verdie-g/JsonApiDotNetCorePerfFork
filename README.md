@@ -19,51 +19,31 @@ ASP.Net Core → JsonApiDotNetCore → Entity Framework Core → Npgsql → Post
 
 ### Execution Environment
 
-The app and database run inside separate docker containers using docker-compose for orchestration.
-The test can be executed locally or on a Digital Ocean VM.
-docker-machine is used to create the VM on demand using the token specified in variables.env.
-
-## Running The Test
+The PostgreSQL database as well as a Grafana stack are run inside docker and the vegeta load testing tool are run
+in docker. The app itself is run outside of Docker so it's easier to profile it. The app emits many different metrics
+to Grafana to be able to easily find potential bottlenecks.
 
 ### Pre-Requisites
 
 * Docker
 * Docker Compose
-* Docker Machine
+* .NET 8.0
 
-### Running Locally
+### Running The Test
 
-- Set configuration in `variables.env` and source them into your shell
-
-```sh
-cp ./variables.env.sample ./variables.env
-open ./variables.env
-# edit the config, GH and DO values are not required for local testing
+Run the database and Grafana
+```
+docker-compose -f infra/infra.yml build --pull
+docker-compose -f infra/infra.yml up -d
+```
+Run the app in a first terminal
+```
+dotnet run -c Release --project app
+```
+and the load test in a second terminal
+```
+ ./load-test/run.sh
 ```
 
-- Run the test
-
-```sh
-./run-local.sh
-```
-
-- The test results will be dumped to `./load-test/results`
-
-### Running On Digital Ocean Droplet
-
-- Set configuration in `variables.env`
-- Run the test
-
-```
-./run-on-droplet.sh
-```
-
-- Delete the droplet when done
-
-```
-./remove-droplet.sh
-```
-
-### Uploading Results to GitHub
-
-- Ensure `UPLOAD_RESULTS` is set to `true` in variables.env file
+Then you can observe the real-time performance on Grafana (http://localhost:3000).
+![image](https://github.com/json-api-dotnet/PerformanceReports/assets/9092290/c93e764f-0593-4c6f-960d-600adb397099)
