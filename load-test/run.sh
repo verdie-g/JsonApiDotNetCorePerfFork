@@ -7,4 +7,4 @@ rm -rf $results_dir
 mkdir -p $results_dir
 
 docker build --tag jadnc-load-test "$script_dir"
-docker run --rm --interactive --tty --volume /$(cd $results_dir; pwd):/app/results jadnc-load-test
+docker run --rm --interactive --tty --network host --volume $(cd $results_dir; pwd):/app/results jadnc-load-test

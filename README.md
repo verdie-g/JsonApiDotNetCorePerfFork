@@ -42,8 +42,13 @@ dotnet run -c Release --project app
 ```
 and the load test in a second terminal
 ```
- ./load-test/run.sh
+./load-test/run.sh
 ```
 
 Then you can observe the real-time performance on Grafana (http://localhost:3000).
 ![image](https://github.com/json-api-dotnet/PerformanceReports/assets/9092290/c93e764f-0593-4c6f-960d-600adb397099)
+
+Once you're done you can run that command to stop the infra
+```
+docker-compose -f infra/infra.yml down
+```

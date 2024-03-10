@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using App;
 using App.Data;
+using App.Definitions;
 using JsonApiDotNetCore.Configuration;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Exporter;
@@ -24,6 +25,7 @@ builder.Services.AddJsonApi<AppDbContext>(options =>
     options.IncludeTotalResourceCount = true;
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+builder.Services.AddResourceDefinition<TodoItemDefinition>();
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(b => b.AddService("app"))
@@ -40,6 +42,8 @@ builder.Services.AddOpenTelemetry()
                 metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 15_000;
             });
     });
+
+builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
 

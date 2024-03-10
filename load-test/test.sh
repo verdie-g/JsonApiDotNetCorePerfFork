@@ -2,7 +2,7 @@
 
 set -e
 
-BASE_URL='http://host.docker.internal:5000'
+BASE_URL='http://localhost:5000'
 
 results_dir="./results"
 
@@ -52,11 +52,11 @@ post_tag() {
     attack "Tag" "{\"method\": \"POST\", \"url\": \"$BASE_URL/tags\", \"headers\": {\"Content-Type\": \"application/vnd.api+json\"}, \"body\": \"eyJkYXRhIjp7InR5cGUiOiJ0YWdzIiwiYXR0cmlidXRlcyI6eyJuYW1lIjogIlRoaXMgaXMgYW4gZXhhbXBsZSB0YWcifX19\"}" $1 $2
 }
 
-# get_todoItems 50 5
-# get_todoItems_sort 50 5
-get_todoItem_includes 100 5
-# get_todoItems_pagination 50 5
-# get_todoItems_filter 50 5
-# get_todoItems_fields 100 5
-# get_todoItem_tags 100 5
-# post_tag 50 5
+get_todoItem_includes 500 5
+get_todoItems 100 5
+get_todoItems_sort 100 5
+get_todoItems_pagination 100 5
+get_todoItems_filter 100 5
+get_todoItems_fields 100 5
+get_todoItem_tags 100 5
+post_tag 100 5

@@ -4,11 +4,10 @@ using JsonApiDotNetCore.Configuration;
 using JsonApiDotNetCore.Middleware;
 using JsonApiDotNetCore.Queries.Expressions;
 using JsonApiDotNetCore.Resources;
-using Microsoft.AspNetCore.Authentication;
 
 namespace App.Definitions;
 
-public sealed class TodoItemDefinition(IResourceGraph resourceGraph, ISystemClock systemClock)
+public sealed class TodoItemDefinition(IResourceGraph resourceGraph, TimeProvider timeProvider)
     : JsonApiResourceDefinition<TodoItem, int>(resourceGraph)
 {
     public override SortExpression OnApplySort(SortExpression? existingSort)
@@ -28,8 +27,13 @@ public sealed class TodoItemDefinition(IResourceGraph resourceGraph, ISystemCloc
         CancellationToken cancellationToken)
     {
         if (writeOperation == WriteOperationKind.CreateResource)
-            resource.CreatedAt = systemClock.UtcNow;
-        else if (writeOperation == WriteOperationKind.UpdateResource) resource.LastModifiedAt = systemClock.UtcNow;
+        {
+            resource.CreatedAt = timeProvider.GetUtcNow();
+        }
+        else if (writeOperation == WriteOperationKind.UpdateResource)
+        {
+            resource.LastModifiedAt = timeProvider.GetUtcNow();
+        }
 
         return Task.CompletedTask;
     }
